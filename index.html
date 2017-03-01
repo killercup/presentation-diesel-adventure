@@ -99,7 +99,8 @@
 </section></section>
 <section><section id="getting-started" class="titleslide slide level1"><h1>Getting started</h1></section><section class="slide level2">
 
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash">$ <span class="ex">cargo</span> new --bin diesel-example<span class="kw">;</span> <span class="bu">cd</span> diesel-example
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash">$ <span class="ex">cargo</span> new --bin diesel-example
+$ <span class="bu">cd</span> diesel-example
 $ <span class="bu">echo</span> <span class="st">&quot;DATABASE_URL=test.db&quot;</span> <span class="op">&gt;</span> .env</code></pre></div>
 <p>Add to <code>Cargo.toml</code>:</p>
 <pre class="toml"><code>[dependencies]
@@ -193,7 +194,7 @@ dotenv = &quot;0.8.0&quot;</code></pre>
 </section><section id="using-rustdoc-to-create-mazes" class="slide level2">
 <h2>Using rustdoc to Create Mazes</h2>
 <p><strong><a href="http://docs.diesel.rs">docs.diesel.rs</a></strong></p>
-<p>Protip: Just search for what you think it should be called</p>
+<p>Pro tip: Just search for what you think it should be called</p>
 </section></section>
 <section><section id="mapping-types" class="titleslide slide level1"><h1>A Duality of Types</h1></section><section class="slide level2">
 
@@ -238,11 +239,11 @@ dotenv = &quot;0.8.0&quot;</code></pre>
 </section></section>
 <section><section id="infer_schema" class="titleslide slide level1"><h1>The Amazing Schema Inference</h1></section><section class="slide level2">
 
-<p>Never let your code and databa schema diverge!</p>
+<p>Never let your code and database schema diverge!</p>
 <p><code>infer_schema!(&quot;dotenv:DATABASE_URL&quot;);</code></p>
 </section><section class="slide level2">
 
-<p>It bascially generates the <a href="#/table"><code>table!</code></a> macro calls for you.</p>
+<p>It basically generates the <a href="#/table"><code>table!</code></a> macro calls for you.</p>
 </section><section class="slide level2">
 
 <ul>
@@ -363,7 +364,7 @@ dotenv = &quot;0.8.0&quot;</code></pre>
 <p>Enable query builder features depending on the used backend</p>
 <ul>
 <li>Basically every type and trait is generic over the backend</li>
-<li>E.g.: Only Postgres implementes <code>RETURNING</code> clause</li>
+<li>E.g.: Only Postgres implements <code>RETURNING</code> clause</li>
 </ul>
 </section></section>
 <section><section id="testing-diesel" class="titleslide slide level1"><h1>Testing Diesel</h1></section><section id="unit-tests" class="slide level2">

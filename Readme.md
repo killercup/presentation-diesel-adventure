@@ -31,7 +31,8 @@ date: 2017-03-01
 ---
 
 ```sh
-$ cargo new --bin diesel-example; cd diesel-example
+$ cargo new --bin diesel-example
+$ cd diesel-example
 $ echo "DATABASE_URL=test.db" > .env
 ```
 
@@ -156,7 +157,7 @@ impl<T, Predicate, ST> FilterDsl<Predicate> for T where
 
 **[docs.diesel.rs](http://docs.diesel.rs)**
 
-Protip: Just search for what you think it should be called
+Pro tip: Just search for what you think it should be called
 
 # A Duality of Types {#mapping-types}
 
@@ -208,13 +209,13 @@ table! {
 
 ---
 
-Never let your code and databa schema diverge!
+Never let your code and database schema diverge!
 
 `infer_schema!("dotenv:DATABASE_URL");`
 
 ---
 
-It bascially generates the [`table!`](#table) macro calls for you.
+It basically generates the [`table!`](#table) macro calls for you.
 
 ---
 
@@ -372,7 +373,7 @@ Macros to implement traits for generic tuples of up to 52 elements
 Enable query builder features depending on the used backend
 
 - Basically every type and trait is generic over the backend
-- E.g.: Only Postgres implementes `RETURNING` clause
+- E.g.: Only Postgres implements `RETURNING` clause
 
 
 # Testing Diesel
