@@ -14,6 +14,7 @@ date: 2017-03-01
 [twitter]: https://twitter.com/killercup
 [github]: https://github.com/killercup
 
+
 # First off
 
 ## [diesel.rs](http://diesel.rs)
@@ -50,6 +51,7 @@ dotenv = "0.8.0"
 ---
 
 And you are good to go!
+
 
 # Query Builder
 
@@ -90,6 +92,7 @@ use schema::todos::dsl::{todos, done};
 - [Tell me more about this DSL](#dsl)
 - [What kind of sorcery is `infer_schema!`?!](#infer_schema)
 
+
 # DSL {#dsl}
 
 ## Idea
@@ -126,6 +129,7 @@ SelectStatement<
 - [That sounds like a lot of boilerplate…](#table)
 - [Is this what makes it fast?](#perf)
 
+
 # Traits for Everything {#traits}
 
 ---
@@ -161,6 +165,12 @@ impl<T, Predicate, ST> FilterDsl<Predicate> for T where
 
 Pro tip: Just search for what you think it should be called
 
+---
+
+- [Do I need to implement these traits myself?](#derive)
+- [What's with the `SqlType`?](#mapping-types)
+
+
 # A Duality of Types {#mapping-types}
 
 ---
@@ -182,6 +192,10 @@ and ways to convert between them
 - `FromSql`, `ToSql`
 - Can map 1:1 like [`Float`](http://docs.diesel.rs/diesel/types/struct.Float.html)
 - Or not, like [`Timestamp`](http://docs.diesel.rs/diesel/types/struct.Timestamp.html)
+
+---
+
+- [Do I need to implement these conversions myself?](#derive)
 
 
 # The `table!` Macro {#table}
@@ -206,6 +220,7 @@ table! {
 
 - [Those don't look like Rust types](#mapping-types)
 - [Do I have to type that?](#infer_schema)
+
 
 # The Amazing Schema Inference {#infer_schema}
 
@@ -237,11 +252,12 @@ prints the `table!` macro calls `infer_schema!` generates
 - [How do you manage migrations](#migrations)
 - [Oh, what's that `diesel` tool?](#cli)
 
-# Derive ALL the Traits
+
+# Derive ALL the Traits {#derive}
 
 ---
 
-Did I tell you about our Lord and Savior, Macros 1.1?
+[Did I tell you about our Lord and Savior, Macros 1.1?](https://blog.rust-lang.org/2017/02/02/Rust-1.15.html)
 
 ---
 
@@ -268,6 +284,8 @@ It Just Works™
 > It also provides the macros [`infer_schema!`][infer-schema],
 > [`infer_table_from_schema!`][infer-table-from-schema], and
 > [`embed_migrations!`][embed-migrations].
+>
+> – [diesel_codegen Readme](https://github.com/diesel-rs/diesel/tree/6a6f5835a40efd515dfc774d4b1d335cc87dd4da/diesel_codegen)
 
 [queryable]: http://docs.diesel.rs/diesel/query_source/trait.Queryable.html
 [identifiable]: http://docs.diesel.rs/diesel/associations/trait.Identifiable.html
@@ -280,8 +298,11 @@ It Just Works™
 
 ---
 
+- [How do these traits work?](#traits)
+- [Associations, you say?](#associations)
 
-# Associations
+
+# Associations {#associations}
 
 ---
 
@@ -297,8 +318,6 @@ pub struct Post { id: i32, user_id: i32, title: String, }
 
 ---
 
----
-
 ```rust
 let user = try!(users::find(1).first(&connection));
 let posts = Post::belonging_to(&user).load(&connection);
@@ -308,7 +327,6 @@ let posts = Post::belonging_to(&user).load(&connection);
 
 Read much more about this at [docs.diesel.rs/diesel/associations/](http://docs.diesel.rs/diesel/associations/index.html)
 
----
 
 # Diesel CLI Tool {#cli}
 
@@ -352,6 +370,7 @@ Simple SQL files that change your database schema (e.g. `CREATE TABLE`, `DROP TA
 
 - [Oh, what's that `diesel` tool?](#cli)
 
+
 # Performance {#perf}
 
 ---
@@ -363,6 +382,7 @@ Simple SQL files that change your database schema (e.g. `CREATE TABLE`, `DROP TA
 ---
 
 - Is it faster than `c`? [Yes you can use Diesel in warp drives](https://hackernoon.com/comparing-diesel-and-rust-postgres-97fd8c656fdd#.kdof0mold)
+
 
 # Type System Shenanigans
 

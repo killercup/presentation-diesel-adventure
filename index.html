@@ -198,6 +198,12 @@ dotenv = &quot;0.8.0&quot;</code></pre>
 <h2>Using rustdoc to Create Mazes</h2>
 <p><strong><a href="http://docs.diesel.rs">docs.diesel.rs</a></strong></p>
 <p>Pro tip: Just search for what you think it should be called</p>
+</section><section class="slide level2">
+
+<ul>
+<li><a href="#/derive">Do I need to implement these traits myself?</a></li>
+<li><a href="#/mapping-types">What's with the <code>SqlType</code>?</a></li>
+</ul>
 </section></section>
 <section><section id="mapping-types" class="titleslide slide level1"><h1>A Duality of Types</h1></section><section class="slide level2">
 
@@ -219,6 +225,11 @@ dotenv = &quot;0.8.0&quot;</code></pre>
 <li><code>FromSql</code>, <code>ToSql</code></li>
 <li>Can map 1:1 like <a href="http://docs.diesel.rs/diesel/types/struct.Float.html"><code>Float</code></a></li>
 <li>Or not, like <a href="http://docs.diesel.rs/diesel/types/struct.Timestamp.html"><code>Timestamp</code></a></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><a href="#/derive">Do I need to implement these conversions myself?</a></li>
 </ul>
 </section></section>
 <section><section id="table" class="titleslide slide level1"><h1>The <code>table!</code> Macro</h1></section><section class="slide level2">
@@ -265,9 +276,9 @@ dotenv = &quot;0.8.0&quot;</code></pre>
 <li><a href="#/cli">Oh, what's that <code>diesel</code> tool?</a></li>
 </ul>
 </section></section>
-<section><section id="derive-all-the-traits" class="titleslide slide level1"><h1>Derive ALL the Traits</h1></section><section class="slide level2">
+<section><section id="derive" class="titleslide slide level1"><h1>Derive ALL the Traits</h1></section><section class="slide level2">
 
-<p>Did I tell you about our Lord and Savior, Macros 1.1?</p>
+<p><a href="https://blog.rust-lang.org/2017/02/02/Rust-1.15.html">Did I tell you about our Lord and Savior, Macros 1.1?</a></p>
 </section><section class="slide level2">
 
 <div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>macro_use<span class="at">]</span> <span class="kw">extern</span> <span class="kw">crate</span> diesel;
@@ -285,9 +296,14 @@ dotenv = &quot;0.8.0&quot;</code></pre>
 <blockquote>
 <p>Diesel Codegen provides custom derive implementations for <a href="http://docs.diesel.rs/diesel/query_source/trait.Queryable.html"><code>Queryable</code></a>, <a href="http://docs.diesel.rs/diesel/associations/trait.Identifiable.html"><code>Identifiable</code></a>, <a href="http://docs.diesel.rs/diesel/prelude/trait.Insertable.html"><code>Insertable</code></a>, <a href="http://docs.diesel.rs/diesel/query_builder/trait.AsChangeset.html"><code>AsChangeset</code></a>, and <a href="http://docs.diesel.rs/diesel/associations/index.html"><code>Associations</code></a>.</p>
 <p>It also provides the macros <a href="http://docs.diesel.rs/diesel/macro.infer_schema!.html"><code>infer_schema!</code></a>, <a href="http://docs.diesel.rs/diesel/macro.infer_table_from_schema!.html"><code>infer_table_from_schema!</code></a>, and <a href="http://docs.diesel.rs/diesel/macro.embed_migrations!.html"><code>embed_migrations!</code></a>.</p>
+<p>– <a href="https://github.com/diesel-rs/diesel/tree/6a6f5835a40efd515dfc774d4b1d335cc87dd4da/diesel_codegen">diesel_codegen Readme</a></p>
 </blockquote>
 </section><section class="slide level2">
 
+<ul>
+<li><a href="#/traits">How do these traits work?</a></li>
+<li><a href="#/associations">Associations, you say?</a></li>
+</ul>
 </section></section>
 <section><section id="associations" class="titleslide slide level1"><h1>Associations</h1></section><section class="slide level2">
 
@@ -300,15 +316,11 @@ dotenv = &quot;0.8.0&quot;</code></pre>
 <span class="kw">pub</span> <span class="kw">struct</span> Post <span class="op">{</span> id: <span class="dt">i32</span>, user_id: <span class="dt">i32</span>, title: <span class="dt">String</span>, <span class="op">}</span></code></pre></div>
 </section><section class="slide level2">
 
-</section><section class="slide level2">
-
 <div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">let</span> user = <span class="pp">try!</span>(users::find(<span class="dv">1</span>).first(&amp;connection));
 <span class="kw">let</span> posts = Post::belonging_to(&amp;user).load(&amp;connection);</code></pre></div>
 </section><section class="slide level2">
 
 <p>Read much more about this at <a href="http://docs.diesel.rs/diesel/associations/index.html">docs.diesel.rs/diesel/associations/</a></p>
-</section><section class="slide level2">
-
 </section></section>
 <section><section id="cli" class="titleslide slide level1"><h1>Diesel CLI Tool</h1></section><section class="slide level2">
 
