@@ -53,9 +53,6 @@
     .reveal a:visited {
       color: #8ea9d2;
     }
-    .reveal a:visited:before {
-      content: "✔";
-    }
   </style>
   <link rel="stylesheet" href="template/css/theme/solarized.css" id="theme">
   <!-- Printing and PDF exports -->
@@ -100,7 +97,24 @@
 <li>MySQL</li>
 </ul>
 </section></section>
-<section><section id="query-builder" class="titleslide slide level1"><h1>Query Builder</h1></section><section id="basic-usage" class="slide level2">
+<section><section id="getting-started" class="titleslide slide level1"><h1>Getting started</h1></section><section class="slide level2">
+
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash">$ <span class="ex">cargo</span> new --bin diesel-example<span class="kw">;</span> <span class="bu">cd</span> diesel-example
+$ <span class="bu">echo</span> <span class="st">&quot;DATABASE_URL=test.db&quot;</span> <span class="op">&gt;</span> .env</code></pre></div>
+<p>Add to <code>Cargo.toml</code>:</p>
+<pre class="toml"><code>[dependencies]
+diesel = { version = &quot;0.10.1&quot;, features = [&quot;sqlite&quot;] }
+diesel_codegen = { version = &quot;0.10.1&quot;, features = [&quot;sqlite&quot;] }
+dotenv = &quot;0.8.0&quot;</code></pre>
+</section><section class="slide level2">
+
+<p>And you are good to go!</p>
+</section></section>
+<section><section id="query-builder" class="titleslide slide level1"><h1>Query Builder</h1></section><section class="slide level2">
+
+<p>Write queries in Rust</p>
+<p>Invalid queries are compile-time errors</p>
+</section><section id="basic-usage" class="slide level2">
 <h2>Basic Usage</h2>
 <div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">let</span> still_todo: <span class="dt">Vec</span>&lt;Todo&gt; =
     todos
@@ -137,8 +151,8 @@
 </section><section id="intuitive-methods" class="slide level2">
 <h2>Intuitive Methods</h2>
 <ul>
-<li><code>todos.select(title)</code></li>
-<li><code>todos.filter(done.eq(false))</code></li>
+<li><code>todos.select((id, title))</code></li>
+<li><code>.filter(done.eq(false))</code></li>
 <li><code>.limit(100)</code></li>
 </ul>
 </section><section id="each-method-returns-a-new-nested-type." class="slide level2">
@@ -247,9 +261,70 @@
 <li><a href="#/cli">Oh, what's that <code>diesel</code> tool?</a></li>
 </ul>
 </section></section>
-<section><section id="derive-all-the-traits" class="titleslide slide level1"><h1>Derive ALL the Traits</h1></section></section>
-<section><section id="associations" class="titleslide slide level1"><h1>Associations</h1></section></section>
-<section><section id="cli" class="titleslide slide level1"><h1>Diesel CLI Tool</h1></section></section>
+<section><section id="derive-all-the-traits" class="titleslide slide level1"><h1>Derive ALL the Traits</h1></section><section class="slide level2">
+
+<p>Did I tell you about our Lord and Savior, Macros 1.1?</p>
+</section><section class="slide level2">
+
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>macro_use<span class="at">]</span> <span class="kw">extern</span> <span class="kw">crate</span> diesel;
+<span class="at">#[</span>macro_use<span class="at">]</span> <span class="kw">extern</span> <span class="kw">crate</span> diesel_codegen;
+
+<span class="at">#[</span>derive<span class="at">(</span><span class="bu">Debug</span><span class="at">,</span> Queryable<span class="at">)]</span>
+<span class="kw">struct</span> Todo <span class="op">{</span>
+    id: <span class="dt">i32</span>,
+    title: <span class="dt">String</span>,
+    done: <span class="dt">bool</span>,
+<span class="op">}</span></code></pre></div>
+<p>It Just Works™</p>
+</section><section class="slide level2">
+
+<blockquote>
+<p>Diesel Codegen provides custom derive implementations for <a href="http://docs.diesel.rs/diesel/query_source/trait.Queryable.html"><code>Queryable</code></a>, <a href="http://docs.diesel.rs/diesel/associations/trait.Identifiable.html"><code>Identifiable</code></a>, <a href="http://docs.diesel.rs/diesel/prelude/trait.Insertable.html"><code>Insertable</code></a>, <a href="http://docs.diesel.rs/diesel/query_builder/trait.AsChangeset.html"><code>AsChangeset</code></a>, and <a href="http://docs.diesel.rs/diesel/associations/index.html"><code>Associations</code></a>.</p>
+<p>It also provides the macros <a href="http://docs.diesel.rs/diesel/macro.infer_schema!.html"><code>infer_schema!</code></a>, <a href="http://docs.diesel.rs/diesel/macro.infer_table_from_schema!.html"><code>infer_table_from_schema!</code></a>, and <a href="http://docs.diesel.rs/diesel/macro.embed_migrations!.html"><code>embed_migrations!</code></a>.</p>
+</blockquote>
+</section><section class="slide level2">
+
+</section></section>
+<section><section id="associations" class="titleslide slide level1"><h1>Associations</h1></section><section class="slide level2">
+
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>derive<span class="at">(</span>Identifiable<span class="at">,</span> Queryable<span class="at">,</span> Associations<span class="at">)]</span>
+<span class="at">#[</span>has_many<span class="at">(</span>posts<span class="at">)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> User <span class="op">{</span> id: <span class="dt">i32</span>, name: <span class="dt">String</span>, <span class="op">}</span>
+
+<span class="at">#[</span>derive<span class="at">(</span>Identifiable<span class="at">,</span> Queryable<span class="at">,</span> Associations<span class="at">)]</span>
+<span class="at">#[</span>belongs_to<span class="at">(</span>User<span class="at">)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> Post <span class="op">{</span> id: <span class="dt">i32</span>, user_id: <span class="dt">i32</span>, title: <span class="dt">String</span>, <span class="op">}</span></code></pre></div>
+</section><section class="slide level2">
+
+</section><section class="slide level2">
+
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">let</span> user = <span class="pp">try!</span>(users::find(<span class="dv">1</span>).first(&amp;connection));
+<span class="kw">let</span> posts = Post::belonging_to(&amp;user).load(&amp;connection);</code></pre></div>
+</section><section class="slide level2">
+
+<p>Read much more about this at <a href="http://docs.diesel.rs/diesel/associations/index.html">docs.diesel.rs/diesel/associations/</a></p>
+</section><section class="slide level2">
+
+</section></section>
+<section><section id="cli" class="titleslide slide level1"><h1>Diesel CLI Tool</h1></section><section class="slide level2">
+
+<p>Install it with</p>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash">$ <span class="ex">cargo</span> install diesel</code></pre></div>
+</section><section class="slide level2">
+
+<p>This makes it easy to</p>
+<ul>
+<li>Setup your database</li>
+<li>Manage your <a href="#/migrations">migrations</a></li>
+<li>Print your schema</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><a href="#/migrations">Tell me more about migrations</a></li>
+<li><a href="#/infer_schema">What was that about schema printing?</a></li>
+</ul>
+</section></section>
 <section><section id="migrations" class="titleslide slide level1"><h1>Migrations</h1></section><section class="slide level2">
 
 <p><code>migrations/datetime-name/{up,down}.sql</code></p>
@@ -280,8 +355,47 @@
 <li>Is it faster than <code>c</code>? <a href="https://hackernoon.com/comparing-diesel-and-rust-postgres-97fd8c656fdd#.kdof0mold">Yes you can use Diesel in warp drives</a></li>
 </ul>
 </section></section>
-<section><section id="conclusion" class="titleslide slide level1"><h1>Conclusion</h1></section></section>
-<section><section id="thank-you" class="titleslide slide level1"><h1>Thank you!</h1></section></section>
+<section><section id="type-system-shenanigans" class="titleslide slide level1"><h1>Type System Shenanigans</h1></section><section class="slide level2">
+
+<p>Macros to implement traits for generic tuples of up to 52 elements</p>
+</section><section class="slide level2">
+
+<p>Enable query builder features depending on the used backend</p>
+<ul>
+<li>Basically every type and trait is generic over the backend</li>
+<li>E.g.: Only Postgres implementes <code>RETURNING</code> clause</li>
+</ul>
+</section></section>
+<section><section id="testing-diesel" class="titleslide slide level1"><h1>Testing Diesel</h1></section><section id="unit-tests" class="slide level2">
+<h2>Unit tests</h2>
+<p>For helper/converter functions</p>
+<ul>
+<li><code>unix_epoch_decodes_correctly_with_timezone</code></li>
+<li><code>queries_with_different_types_have_different_ids</code></li>
+</ul>
+</section><section id="integration-tests" class="slide level2">
+<h2>Integration tests</h2>
+<p>Using diesel like a library</p>
+</section><section id="doc-test" class="slide level2">
+<h2>Doc test</h2>
+<p>Examples in the API documentation are tests!</p>
+</section><section class="slide level2">
+
+<p>Secret sauce: <code>include!(&quot;src/doctest_setup.rs&quot;);</code></p>
+</section><section id="quickcheck" class="slide level2">
+<h2>Quickcheck</h2>
+<p>Test roundtrips from Rust → DB → Rust</p>
+<p>(With lots of macros, of course)</p>
+<p><a href="https://github.com/diesel-rs/diesel/blob/6a6f5835a40efd515dfc774d4b1d335cc87dd4da/diesel_tests/tests/types_roundtrip.rs">Source</a></p>
+</section><section id="compile-fail-tests" class="slide level2">
+<h2>Compile-fail Tests</h2>
+<p>Invalid queries should not compile</p>
+<p>So let's test that they return the expected errors!</p>
+</section><section class="slide level2">
+
+<p>The <a href="https://github.com/laumann/compiletest-rs">compiletest</a> tool is also used by the Rust compiler and Clippy</p>
+</section></section>
+<section><section id="thank-you-for-listening" class="titleslide slide level1"><h1>Thank you for listening!</h1></section></section>
 <section><section id="questions" class="titleslide slide level1"><h1>Questions?</h1></section><section class="slide level2">
 
 <p>Slides are available at <a href="https://git.io/diesel-adventure">git.io/diesel-adventure</a></p>

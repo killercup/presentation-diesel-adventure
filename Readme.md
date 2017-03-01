@@ -50,6 +50,12 @@ And you are good to go!
 
 # Query Builder
 
+---
+
+Write queries in Rust
+
+Invalid queries are compile-time errors
+
 ## Basic Usage
 
 ```rust
@@ -92,8 +98,8 @@ use schema::todos::dsl::{todos, done};
 
 ## Intuitive Methods
 
-- `todos.select(title)`
-- `todos.filter(done.eq(false))`
+- `todos.select((id, title))`
+- `.filter(done.eq(false))`
 - `.limit(100)`
 
 ## Each method returns a new, nested type.
@@ -354,6 +360,59 @@ Simple SQL files that change your database schema (e.g. `CREATE TABLE`, `DROP TA
 ---
 
 - Is it faster than `c`? [Yes you can use Diesel in warp drives](https://hackernoon.com/comparing-diesel-and-rust-postgres-97fd8c656fdd#.kdof0mold)
+
+# Type System Shenanigans
+
+---
+
+Macros to implement traits for generic tuples of up to 52 elements
+
+---
+
+Enable query builder features depending on the used backend
+
+- Basically every type and trait is generic over the backend
+- E.g.: Only Postgres implementes `RETURNING` clause
+
+
+# Testing Diesel
+
+## Unit tests
+
+For helper/converter functions
+
+- `unix_epoch_decodes_correctly_with_timezone`
+- `queries_with_different_types_have_different_ids`
+
+## Integration tests
+
+Using diesel like a library
+
+## Doc test
+
+Examples in the API documentation are tests!
+
+---
+
+Secret sauce: `include!("src/doctest_setup.rs");`
+
+## Quickcheck
+
+Test roundtrips from Rust → DB → Rust
+
+(With lots of macros, of course)
+
+[Source](https://github.com/diesel-rs/diesel/blob/6a6f5835a40efd515dfc774d4b1d335cc87dd4da/diesel_tests/tests/types_roundtrip.rs)
+
+## Compile-fail Tests
+
+Invalid queries should not compile
+
+So let's test that they return the expected errors!
+
+---
+
+The [compiletest](https://github.com/laumann/compiletest-rs) tool is also used by the Rust compiler and Clippy
 
 # Thank you for listening!
 
