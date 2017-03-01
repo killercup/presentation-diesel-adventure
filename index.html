@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Pascal Hertleif">
+  <meta name="dcterms.date" content="2017-03-01">
+  <title>Diesel – Type-safe SQL</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="template/css/reveal.css">
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="template/css/theme/solarized.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'template/css/print/pdf.css' : 'template/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="template/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+  <h1 class="title">Diesel – Type-safe SQL</h1>
+  <p class="author">Pascal Hertleif</p>
+  <p class="date">2017-03-01</p>
+</section>
+
+<section id="pascal-hertleif" class="slide level2">
+<h2>Pascal Hertleif</h2>
+<ul>
+<li>Web stuff by day, Rust enthusiast by night!</li>
+<li>Coorganizer of <a href="http://rust.cologne/">Rust Cologne</a></li>
+<li>{<a href="https://twitter.com/killercup">twitter</a>,<a href="https://github.com/killercup">github</a>}.com/killercup</li>
+</ul>
+</section>
+<section><section id="first-off" class="titleslide slide level1"><h1>First off</h1></section><section id="diesel.rs" class="slide level2">
+<h2><a href="http://diesel.rs">diesel.rs</a></h2>
+</section><section id="requires-rust-1.15" class="slide level2">
+<h2>Requires Rust 1.15</h2>
+</section><section id="supported-backends" class="slide level2">
+<h2>Supported Backends</h2>
+<ul>
+<li>Postgres</li>
+<li>SQLite</li>
+<li>MySQL</li>
+</ul>
+</section></section>
+<section><section id="query-builder" class="titleslide slide level1"><h1>Query Builder</h1></section><section id="basic-usage" class="slide level2">
+<h2>Basic Usage</h2>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">let</span> still_todo: <span class="dt">Vec</span>&lt;Todo&gt; =
+    todos
+    .filter(done.eq(<span class="cn">false</span>))
+    .limit(<span class="dv">100</span>)
+    .load(&amp;connection)
+    .unwrap();</code></pre></div>
+</section><section class="slide level2">
+
+<p>Not shown:</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>derive<span class="at">(</span>Queryable<span class="at">)]</span>
+<span class="kw">struct</span> Todo <span class="op">{</span> title: <span class="dt">String</span>, done: <span class="dt">bool</span> <span class="op">}</span>;
+
+<span class="kw">pub</span> <span class="kw">mod</span> schema <span class="op">{</span>
+    <span class="pp">infer_schema!</span>(<span class="st">&quot;dotenv:DATABASE_URL&quot;</span>);
+<span class="op">}</span>
+
+<span class="kw">use</span> schema::todos::dsl::<span class="op">{</span>todos, done<span class="op">}</span>;</code></pre></div>
+</section><section class="slide level2">
+
+<ul>
+<li><a href="#/dsl">Tell me more about this DSL</a></li>
+<li><a href="#/infer_schema">What kind of sorcery is <code>infer_schema!</code>?!</a></li>
+</ul>
+</section></section>
+<section><section id="dsl" class="titleslide slide level1"><h1>DSL</h1></section><section id="idea" class="slide level2">
+<h2>Idea</h2>
+<ol type="1">
+<li>Create zero-sized structs for table and its columns</li>
+<li>Implement traits on these structs</li>
+<li>???</li>
+<li>PROFIT!</li>
+</ol>
+</section><section id="intuitive-methods" class="slide level2">
+<h2>Intuitive Methods</h2>
+<ul>
+<li><code>todos.select(title)</code></li>
+<li><code>todos.filter(done.eq(false))</code></li>
+<li><code>.limit(100)</code></li>
+</ul>
+</section><section id="each-method-returns-a-new-nested-type." class="slide level2">
+<h2>Each method returns a new, nested type.</h2>
+<p><code>todos.filter(done.eq(false)).limit(100)</code></p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust">SelectStatement&lt;
+    (Integer, Text, Bool),
+    (todos::id, todos::title, todos::done),
+    todos::table,
+    NoDistinctClause,
+    WhereClause&lt;<span class="bu">Eq</span>&lt;todos::done, Bound&lt;Bool, <span class="dt">bool</span>&gt;&gt;&gt;,
+    NoOrderClause,
+    LimitClause&lt;Bound&lt;BigInt, <span class="dt">i64</span>&gt;&gt;
+&gt;</code></pre></div>
+</section><section class="slide level2">
+
+<ul>
+<li><a href="#/table">That sounds like a lot of boilerplate…</a></li>
+<li><a href="#/perf">Is this what makes it fast?</a></li>
+</ul>
+</section></section>
+<section><section id="traits" class="titleslide slide level1"><h1>Traits Everywhere</h1></section><section id="using-rustdoc-to-create-mazes" class="slide level2">
+<h2>Using rustdoc to Create Mazes</h2>
+<p><strong><a href="http://docs.diesel.rs">docs.diesel.rs</a></strong></p>
+<p>Protip: Just search for what you think it should be called</p>
+</section></section>
+<section><section id="mapping-types" class="titleslide slide level1"><h1>A Duality of Types</h1></section></section>
+<section><section id="table" class="titleslide slide level1"><h1>The <code>table!</code> Macro</h1></section><section class="slide level2">
+
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="pp">table!</span> <span class="op">{</span>
+    todos (id) <span class="op">{</span>
+        id -&gt; Integer,
+        title -&gt; Text,
+        done -&gt; Bool,
+    <span class="op">}</span>
+<span class="op">}</span></code></pre></div>
+</section><section class="slide level2">
+
+<p><a href="file:///Users/pascal/Projekte/diesel-demo/target/doc/diesel_demo/schema/todos/index.html">Let's see what we end up with</a></p>
+</section><section class="slide level2">
+
+<ul>
+<li><a href="#/mapping-types">Those don't look like Rust types</a></li>
+<li><a href="#/infer_schema">Do I have to type that?</a></li>
+</ul>
+</section></section>
+<section><section id="infer_schema" class="titleslide slide level1"><h1>The Amazing <code>infer_schema!</code></h1></section><section class="slide level2">
+
+<p>Never let your code and databa schema diverge!</p>
+<p><code>infer_schema!(&quot;dotenv:DATABASE_URL&quot;);</code></p>
+</section><section class="slide level2">
+
+<p>It bascially generates the <a href="#/table"><code>table!</code></a> macro calls for you.</p>
+</section><section class="slide level2">
+
+<ul>
+<li>You need to have a database running on your dev machine</li>
+<li>The schema needs to be the same as in production</li>
+</ul>
+</section><section class="slide level2">
+
+<p><code>diesel print-schema</code></p>
+<p>prints the <code>table!</code> macro calls <code>infer_schema!</code> generates</p>
+<p>(So you can e.g. put it in version control)</p>
+</section><section class="slide level2">
+
+<ul>
+<li><a href="#/migrations">How do you manage migrations</a></li>
+<li><a href="#/cli">Oh, what's that <code>diesel</code> tool?</a></li>
+</ul>
+</section></section>
+<section><section id="derive-all-the-traits" class="titleslide slide level1"><h1>Derive ALL the Traits</h1></section></section>
+<section><section id="associations" class="titleslide slide level1"><h1>Associations</h1></section></section>
+<section><section id="cli" class="titleslide slide level1"><h1>Diesel CLI Tool</h1></section></section>
+<section><section id="migrations" class="titleslide slide level1"><h1>Migrations</h1></section><section class="slide level2">
+
+<p><code>migrations/datetime-name/{up,down}.sql</code></p>
+<p>Simple SQL files that change your database schema (e.g. <code>CREATE TABLE</code>, <code>DROP TABLE</code>)</p>
+</section><section class="slide level2">
+
+<ul>
+<li><code>diesel migration generate create_todos</code></li>
+<li><code>diesel migration run</code></li>
+<li><code>diesel migration revert</code></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><a href="#/cli">Oh, what's that <code>diesel</code> tool?</a></li>
+</ul>
+</section></section>
+<section><section id="perf" class="titleslide slide level1"><h1>Performance</h1></section><section class="slide level2">
+
+<ul>
+<li>Almost all queries can be represented by unique types</li>
+<li>Each of these types returns a query (that uses bind params)</li>
+<li><p>Let's cache these queries as Prepared Statements!</p></li>
+<li><p>Is it faster than <code>c</code>? <a href="https://hackernoon.com/comparing-diesel-and-rust-postgres-97fd8c656fdd#.kdof0mold">Yes you can use Diesel in warp drives</a></p></li>
+</ul>
+</section></section>
+<section><section id="conclusion" class="titleslide slide level1"><h1>Conclusion</h1></section></section>
+<section><section id="thanks" class="titleslide slide level1"><h1>Thanks</h1></section></section>
+    </div>
+  </div>
+
+  <script src="template/lib/js/head.min.js"></script>
+  <script src="template/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display a presentation progress bar
+        progress: true,
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'template/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'template/plugin/zoom-js/zoom.js', async: true },
+              { src: 'template/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
