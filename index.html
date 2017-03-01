@@ -83,7 +83,7 @@
 <section id="pascal-hertleif" class="slide level2">
 <h2>Pascal Hertleif</h2>
 <ul>
-<li>Web stuff by day, Rust enthusiast by night!</li>
+<li>Web stuff by day, Rust by night!</li>
 <li>Coorganizer of <a href="http://rust.cologne/">Rust Cologne</a></li>
 <li>{<a href="https://twitter.com/killercup">twitter</a>,<a href="https://github.com/killercup">github</a>}.com/killercup</li>
 </ul>
@@ -160,12 +160,49 @@
 <li><a href="#/perf">Is this what makes it fast?</a></li>
 </ul>
 </section></section>
-<section><section id="traits" class="titleslide slide level1"><h1>Traits Everywhere</h1></section><section id="using-rustdoc-to-create-mazes" class="slide level2">
+<section><section id="traits" class="titleslide slide level1"><h1>Traits for Everything</h1></section><section class="slide level2">
+
+<p>Diesel has <code>i32::MAX</code> traits in its codebase last time I counted</p>
+</section><section class="slide level2">
+
+<p>Add methods to methods to query builder? Write a trait like <a href="http://docs.diesel.rs/diesel/prelude/trait.FilterDsl.html"><code>FilterDsl</code></a>!</p>
+<p>And implement generically:</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">impl</span>&lt;T, Predicate, ST&gt; FilterDsl&lt;Predicate&gt; <span class="kw">for</span> T</code></pre></div>
+</section><section class="slide level2">
+
+<p>Well, actually...</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">impl</span>&lt;T, Predicate, ST&gt; FilterDsl&lt;Predicate&gt; <span class="kw">for</span> T <span class="kw">where</span>
+  Predicate: Expression&lt;SqlType=Bool&gt; + NonAggregate,
+  FilteredQuerySource&lt;T, Predicate&gt;: AsQuery&lt;SqlType=ST&gt;,
+  T: AsQuery&lt;SqlType=ST&gt; + NotFiltered</code></pre></div>
+<p>(Those constraints are all traits as well!)</p>
+</section><section id="using-rustdoc-to-create-mazes" class="slide level2">
 <h2>Using rustdoc to Create Mazes</h2>
 <p><strong><a href="http://docs.diesel.rs">docs.diesel.rs</a></strong></p>
 <p>Protip: Just search for what you think it should be called</p>
 </section></section>
-<section><section id="mapping-types" class="titleslide slide level1"><h1>A Duality of Types</h1></section></section>
+<section><section id="mapping-types" class="titleslide slide level1"><h1>A Duality of Types</h1></section><section class="slide level2">
+
+<p>There are</p>
+<ul>
+<li>SQL types</li>
+<li>Rust types</li>
+</ul>
+<p>and ways to convert between them</p>
+</section><section class="slide level2">
+
+<ul>
+<li>Your schema contains SQL types</li>
+<li>Your application's structs contain Rust types</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><code>FromSql</code>, <code>ToSql</code></li>
+<li>Can map 1:1 like <a href="http://docs.diesel.rs/diesel/types/struct.Float.html"><code>Float</code></a></li>
+<li>Or not, like <a href="http://docs.diesel.rs/diesel/types/struct.Timestamp.html"><code>Timestamp</code></a></li>
+</ul>
+</section></section>
 <section><section id="table" class="titleslide slide level1"><h1>The <code>table!</code> Macro</h1></section><section class="slide level2">
 
 <div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="pp">table!</span> <span class="op">{</span>
@@ -185,7 +222,7 @@
 <li><a href="#/infer_schema">Do I have to type that?</a></li>
 </ul>
 </section></section>
-<section><section id="infer_schema" class="titleslide slide level1"><h1>The Amazing <code>infer_schema!</code></h1></section><section class="slide level2">
+<section><section id="infer_schema" class="titleslide slide level1"><h1>The Amazing Schema Inference</h1></section><section class="slide level2">
 
 <p>Never let your code and databa schema diverge!</p>
 <p><code>infer_schema!(&quot;dotenv:DATABASE_URL&quot;);</code></p>
@@ -235,12 +272,21 @@
 <ul>
 <li>Almost all queries can be represented by unique types</li>
 <li>Each of these types returns a query (that uses bind params)</li>
-<li><p>Let's cache these queries as Prepared Statements!</p></li>
-<li><p>Is it faster than <code>c</code>? <a href="https://hackernoon.com/comparing-diesel-and-rust-postgres-97fd8c656fdd#.kdof0mold">Yes you can use Diesel in warp drives</a></p></li>
+<li>Let's cache these queries as Prepared Statements!</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Is it faster than <code>c</code>? <a href="https://hackernoon.com/comparing-diesel-and-rust-postgres-97fd8c656fdd#.kdof0mold">Yes you can use Diesel in warp drives</a></li>
 </ul>
 </section></section>
 <section><section id="conclusion" class="titleslide slide level1"><h1>Conclusion</h1></section></section>
-<section><section id="thanks" class="titleslide slide level1"><h1>Thanks</h1></section></section>
+<section><section id="thank-you" class="titleslide slide level1"><h1>Thank you!</h1></section></section>
+<section><section id="questions" class="titleslide slide level1"><h1>Questions?</h1></section><section class="slide level2">
+
+<p>Slides are available at <a href="https://git.io/diesel-adventure">git.io/diesel-adventure</a></p>
+<p>License: <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></p>
+</section></section>
     </div>
   </div>
 
