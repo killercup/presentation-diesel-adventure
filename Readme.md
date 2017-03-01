@@ -18,6 +18,8 @@ date: 2017-03-01
 
 ## [diesel.rs](http://diesel.rs)
 
+![](assets/diesel.svg){ style="padding: 5px" }
+
 ## Requires Rust 1.15
 
 ## Supported Backends
